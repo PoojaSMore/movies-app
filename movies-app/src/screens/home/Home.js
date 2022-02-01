@@ -3,19 +3,35 @@ import Header from '../../common/header/Header';
 import './Home.css';
 import '../../common/moviesData';
 import moviesData from '../../common/moviesData';
-import { ImageList, ImageListItem, ImageListItemBar } from '@material-ui/core';
+import { Button, Card, CardActionArea, CardActions, CardContent, Checkbox, FormControl, FormControlLabel, FormHelperText, ImageList, ImageListItem, ImageListItemBar, Input, InputAdornment, InputLabel, ListItemText, MenuItem, Select, TextField, Typography } from '@material-ui/core';
+import { createTheme } from '@material-ui/core/styles';
+import { blue, lightBlue } from '@material-ui/core/colors';
+import genres from '../../common/genre';
+import artists from '../../common/artists';
+import Filter from '../../homeFilter';
 
 /* GridList was not working properly, as The Material UI has been updated,
     and GridList was replaced by ImageList, so I'm using ImageList.
 */
 class Home extends Component {
-    state = {
-        movies: moviesData,
-        id: moviesData.id,
-        title: moviesData.title,
-        poster: moviesData.poster_url,
-    } 
-    
+    constructor() {
+        super();
+        this.state = {
+            movies: moviesData,
+            movieName: "",
+            genres: [],
+            artists: [],
+            genresList: [],
+            artistsList: [],
+            releaseDateStart: "",
+            releaseDateEnd: "",
+        }
+    }
+
+    movieNameChangeHandler = event => {
+        this.setState({ movieName: event.target.value });
+    }
+
     //function to convert ISO date into 'Day Month Date Year - e.g. Wed Aug 11 2017' format.
     releaseDate = (releaseDate) =>{
         let release_date = new Date(releaseDate);
@@ -23,7 +39,45 @@ class Home extends Component {
         return "Release Date: "+date;
     }
 
+    //function to store selected Genres values
+    genreSelectHandler = event => {
+        this.setState({ genres: event.target.value });
+        console.log("Genres: ",this.state.genres);
+    }
+
+     //function to store selected Artists values
+    artistSelectHandler = event => {
+        this.setState({ artists: event.target.value });
+        console.log("Artists: ",this.state.artists);
+    }
+
+    //function to apply filters on button click.
+    filterApplyHandler = (movie) => {
+       const filterGenre = this.state.movies.filter(g => g.genres == movie.genre);
+       const filterArtist = this.state.movies.filter(a => a.artists == movie.artist);
+       const releaseStartDate = this.state.movies.filter(sd => sd.release_date == movie.releaseDateStart);
+       
+    }
+
+    //function to store release start date
+    releaseDateStartHandler = event => {
+        this.setState({ releaseDateStart: event.target.value });
+    }
+
+    //function to store release start date
+    releaseDateEndHandler = event => {
+        this.setState({ releaseDateEnd: event.target.value });
+    }
+
     render() { 
+        const theme = createTheme(); 
+        const selectedGenre = this.state.genresList;
+        const selectedArtist = this.state.artistsList;
+        //const isAllSelectedGenre = genre.length > 0 && selectedGenre.length === genre.length;
+
+        const filterStyle = {margin: theme.spacing.unit, color: theme.palette.primary.light, 
+             minWidth: '240px', maxWidth: '240px'}
+        
         return (<div className='container'>
             <Header />
             <div className='heading'>
@@ -43,7 +97,7 @@ class Home extends Component {
                 }
                 </ImageList>
             </div>
-            
+
             {/* Div divided into two parts - released movies(left) and filter(right) */}
             <div className='flex-container'>
                 <div className='left'>
@@ -59,7 +113,72 @@ class Home extends Component {
                     </ImageList>
                 </div>
                 <div className='right'>
+                    <Card style={filterStyle}>
+                        <CardContent >
+                            <Typography gutterBottom style={{fontWeight: 300}}>FIND MOVIES BY: </Typography>
 
+                            {/*movie name enter input*/}
+                            <FormControl variant="standard" margin='dense' fullWidth>
+                                <InputLabel htmlFor="name">Movie Name</InputLabel>
+                                <Input id="name" onChange={this.movieNameChangeHandler}/>
+                            </FormControl>
+
+                            {/*genre select input*/}
+                            <FormControl variant="standard" margin='dense' fullWidth>
+                                <InputLabel htmlFor="genre-multiple-checkbox">Genre</InputLabel>
+                                <Select multiple input={<Input id="genre-multiple-checkbox" />}
+                                        renderValue={(selected) => selected.join(',')}
+                                        value={this.state.genres}
+                                        onChange={this.genreSelectHandler}>
+                                        {
+                                            genres.map(genre => (
+                                            <MenuItem key={genre.id} value={genre.name}>
+                                                <Checkbox checked={this.state.genres.indexOf(genre.name) > -1} />
+                                                <ListItemText primary={genre.name} />
+                                            </MenuItem>
+                                        ))}
+                                    
+                                </Select>
+                            </FormControl>
+
+                            {/*artist select input*/}
+                            <FormControl variant="standard" margin='dense' fullWidth>
+                                <InputLabel htmlFor="artist-multiple-checkbox">Artists</InputLabel>
+                                <Select multiple input={<Input id="artist-multiple-checkbox" />}
+                                        renderValue={(selected) => selected.join(',')}
+                                        value={this.state.artists}
+                                        onChange={this.artistSelectHandler}>
+                                    {
+                                        artists.map(artist => (
+                                        <MenuItem key={artist.id} value={artist.first_name + " " + artist.last_name}>
+                                            <Checkbox checked={this.state.artists.indexOf(artist.first_name + " " + artist.last_name) > -1} />
+                                            <ListItemText primary={artist.first_name + " " + artist.last_name} />
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            {/*release start date input*/}
+                            <FormControl variant="standard" margin='dense' type='date' fullWidth>
+                                <TextField id='dateFrom' label='Release Date Start' InputLabelProps={{shrink: true}} 
+                                    type='date' defaultValue="" onChange={this.releaseDateStartHandler}></TextField>
+                            </FormControl>
+
+                            {/*release end date input*/}
+                            <FormControl variant="standard" margin='dense' type='date' fullWidth>
+                                <TextField id='dateTo' label='Release Date End' InputLabelProps={{shrink: true}} 
+                                    type='date' defaultValue="" onChange={this.releaseDateEndHandler}></TextField>
+                            </FormControl>
+
+                            <br /><br />
+                            {/*button to apply filters*/}
+                            <FormControl fullWidth>
+                                <Button onClick={() => this.filterApplyHandler()} variant="contained" color="primary">
+                                    APPLY
+                                </Button>
+                            </FormControl>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>);
