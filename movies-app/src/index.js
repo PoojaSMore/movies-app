@@ -1,14 +1,21 @@
+import { Switch } from '@material-ui/core';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
+import Details from './screens/details/Details';
+import '../src/screens/details/Details.css'
 import Home from './screens/home/Home';
 
 ReactDOM.render(
   <React.StrictMode>
-    <div>
+      {/* <BrowserRouter>
+        <Switch>
+          <Route exact path='/' component={() => (<Home />)}/>
+          <Route exact path='/Details/:id' component={() => (<Details />)}/>
+        </Switch>
+      </BrowserRouter> */}
       <Home />
-    </div>
-  </React.StrictMode>,
+      </React.StrictMode>,
   document.getElementById('root')
 );
-

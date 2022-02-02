@@ -1,18 +1,4 @@
-import React, { Component } from 'react';
-import Header from '../../common/header/Header';
-import './Home.css';
-import moviesData from '../../assets/moviesData';
-import { Button, Card, CardContent, Checkbox, FormControl, ImageList, ImageListItem, ImageListItemBar, Input, InputAdornment, InputLabel, ListItemText, MenuItem, Select, TextField, Typography } from '@material-ui/core';
-import { createTheme } from '@material-ui/core/styles';
-import genres from '../../common/genre';
-import artists from '../../common/artists';
-import ReactDOM from 'react-dom';
-import Details from '../details/Details';
-
-/* GridList was not working properly, as The Material UI has been updated,
-    and GridList was replaced by ImageList, so I'm using ImageList.
-*/
-class Home extends Component {
+class HomeClass extends Component {
     constructor() {
         super();
         this.state = {
@@ -54,8 +40,7 @@ class Home extends Component {
     filterApplyHandler = (movie) => {
        const filterGenre = this.state.movies.filter(g => g.genres == movie.genre);
        const filterArtist = this.state.movies.filter(a => a.artists == movie.artist);
-       const releaseStartDate = this.state.movies.filter(sd => sd.release_date == movie.releaseDateStart);
-       
+       const releaseStartDate = this.state.movies.filter(sd => sd.release_date == movie.releaseDateStart);    
     }
 
     //function to store release start date
@@ -68,8 +53,8 @@ class Home extends Component {
         this.setState({ releaseDateEnd: event.target.value });
     }
 
-    onImageClickHandler = () => {
-        ReactDOM.render(<Details />, document.getElementById('root'));
+    movieClickHandler = (movieId) => {
+        this.props.history.push('/movie/' + movieId);
     }
 
     render() { 
@@ -107,7 +92,7 @@ class Home extends Component {
                     <ImageList className='release-list' cols={4} gap={30} rowHeight={350}>
                     {
                         this.state.movies.map(tile => (
-                            <ImageListItem className='release-tiles' key={tile.id} onClick={this.onImageClickHandler}>
+                            <ImageListItem className='release-tiles' key={tile.id}>
                                 <img src={tile.poster_url} alt={tile.title}/>
                                 <ImageListItemBar title={tile.title} subtitle={this.releaseDate(tile.release_date)}/>
                             </ImageListItem>
@@ -188,4 +173,4 @@ class Home extends Component {
     }
 }
  
-export default Home;
+export default HomeClass;

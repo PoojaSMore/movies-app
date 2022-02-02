@@ -24,7 +24,7 @@
 }
 /*Released movies div*/
 .left{
-    width: 76%;
+    width: 76% !important;
     margin: 16px;
 }
 .release-tiles img{
